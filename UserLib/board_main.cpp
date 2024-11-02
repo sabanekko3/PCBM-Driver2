@@ -53,6 +53,8 @@ extern "C" void main_(void){
 	b::PIDIns::d_current.set_limit(0.5f);
 	b::PIDIns::q_current.set_limit(0.5f);
 
+	HAL_TIM_Base_Start_IT(&htim2);
+
 	while(1){
 //		b::angle += 100;
 //		b::motor.move(0.2,b::table.sin_cos(b::angle));
@@ -76,17 +78,22 @@ extern "C" void main_(void){
 //				b::dq_i.d,
 //				b::dq_i.q);
 
-		printf("%4.3f,%4.3f,%4.3f,%4.3f,%4.3f,%4.3f\r\n",
-				b::dq_v.d,
-				b::dq_v.q,
-				b::dq_i.d,
-				b::dq_i.q,
-				b::target_i.d,
-				b::target_i.q);
+//		printf("%4.3f,%4.3f,%4.3f,%4.3f,%4.3f,%4.3f\r\n",
+//				b::dq_v.d,
+//				b::dq_v.q,
+//				b::dq_i.d,
+//				b::dq_i.q,
+//				b::target_i.d,
+//				b::target_i.q);
 
-//		printf("%d,%d\r\n",
+//		printf("%d,%d,%d\r\n",
 //				b::e_angle,
-//				-b::enc.get_angle());
+//				-b::enc.get_angle(),
+//				b::speed_lpf(b::enc.get_speed())/100);
+
+		printf("%4.3f,%4.3f\r\n",
+				b::target_i.q,
+				b::speed_lpf(b::enc.get_speed())/100);
 
 		HAL_Delay(10);
 
@@ -122,11 +129,22 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi){
 	b::ab_i = b::uvw_i.to_ab();
 	b::dq_i = b::ab_i.to_dq(sc);
 
-	b::target_i = {0.0f,0.1f};
+//	b::target_i = {0.0f,0.1f};
 
 	b::dq_v = slib::MotorMath::DQ{
 			.d = b::PIDIns::d_current(b::target_i.d,b::dq_i.d),
 			.q = b::PIDIns::q_current(b::target_i.q,b::dq_i.q)};
 
 	b::motor.move(b::dq_v.to_uvw(sc));
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if(htim == &htim2){
+		//位置制御
+//		LL_GPIO_SetOutputPin(LED_GPIO_Port,LED_Pin);
+		b::target_i.d = 0.0f;
+		b::target_i.q = b::PIDIns::speed(20000, -b::enc.get_speed());
+//		LL_GPIO_ResetOutputPin(LED_GPIO_Port,LED_Pin);
+	}
 }

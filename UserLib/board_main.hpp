@@ -37,26 +37,25 @@ extern UART_HandleTypeDef huart1;
 
 namespace BoardElement{
 	inline auto table = SabaneLib::MotorMath::SinTable<10,SabaneLib::MotorMath::TableMode::NORMAL>{};
-	inline auto atan_enc = SabaneLib::ContinuableEncoder{14,1000.f};
 
 	namespace PIDIns{
-		inline auto position = SabaneLib::PIDBuilder(10000.0f)
-				.set_gain(0.000'1f, 0.000'05f, 0.0f)
-				.set_limit(0.0f)
+		inline auto speed = SabaneLib::PIDBuilder(20000.0f)
+				.set_gain(0.000'1f, 0.000'1f, 0.0f)
+				.set_limit(5.0f)
 				.build();
 
-		inline auto d_current = SabaneLib::PIBuilder(10000.0f)
-				.set_gain(0.02f, 200.0f)
-				.set_limit(0.5f)
+		inline auto d_current = SabaneLib::PIBuilder(20000.0f)
+				.set_gain(0.02f, 100.0f)
+				.set_limit(0.8f)
 				.build();
 
-		inline auto q_current = SabaneLib::PIBuilder(10000.0f)
-				.set_gain(0.02f, 200.0f)
-				.set_limit(0.5f)
+		inline auto q_current = SabaneLib::PIBuilder(20000.0f)
+				.set_gain(0.02f, 100.0f)
+				.set_limit(0.8f)
 				.build();
 	}
 
-	inline auto enc = BoardLib::AS5048AState{&hspi1,SS_GPIO_Port,SS_Pin,10000.0f};
+	inline auto enc = BoardLib::AS5048AState{&hspi1,SS_GPIO_Port,SS_Pin,20000.0f};
 
 	inline auto motor = BoardLib::Motor{
 		SabaneLib::PWMHard{&htim1,TIM_CHANNEL_2},
@@ -74,6 +73,8 @@ namespace BoardElement{
 
 	inline int32_t atan_enc_bias = 1357;
 	inline SabaneLib::MotorMath::UVW uvw_i_bias = {.u=0.0f, .v=0.0f, .w=0.0f};
+
+	inline auto speed_lpf = SabaneLib::LowpassFilter<float>{0.1};
 
 	inline q15_t angle = 0;
 	inline q15_t e_angle = 0;
