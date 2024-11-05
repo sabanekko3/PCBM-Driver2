@@ -39,19 +39,23 @@ namespace BoardElement{
 	inline auto table = SabaneLib::MotorMath::SinTable<10,SabaneLib::MotorMath::TableMode::NORMAL>{};
 
 	namespace PIDIns{
+		inline auto position = SabaneLib::PIDBuilder(20000.0f)
+				.set_gain(10.0f,0.0f, 0.0f)
+				.set_limit(10000.0f)
+				.build();
 		inline auto speed = SabaneLib::PIDBuilder(20000.0f)
 				.set_gain(0.000'1f, 0.000'1f, 0.0f)
-				.set_limit(5.0f)
+				.set_limit(10.0f)
 				.build();
 
 		inline auto d_current = SabaneLib::PIBuilder(20000.0f)
 				.set_gain(0.02f, 100.0f)
-				.set_limit(0.8f)
+				.set_limit(1.0f)
 				.build();
 
 		inline auto q_current = SabaneLib::PIBuilder(20000.0f)
 				.set_gain(0.02f, 100.0f)
-				.set_limit(0.8f)
+				.set_limit(1.0f)
 				.build();
 	}
 
@@ -75,6 +79,8 @@ namespace BoardElement{
 	inline SabaneLib::MotorMath::UVW uvw_i_bias = {.u=0.0f, .v=0.0f, .w=0.0f};
 
 	inline auto speed_lpf = SabaneLib::LowpassFilter<float>{0.1};
+
+	inline float target_speed = 0.0f;
 
 	inline q15_t angle = 0;
 	inline q15_t e_angle = 0;

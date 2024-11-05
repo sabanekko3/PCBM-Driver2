@@ -114,6 +114,9 @@ void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc){
 		b::uvw_i.w =  static_cast<float>(ADC2->JDR2)*adc_to_current - b::uvw_i_bias.w;
 		b::uvw_i.u = -b::uvw_i.w - b::uvw_i.v;
 
+		constexpr float adc_to_speed = 500000.0f/static_cast<float>(0xFFF);
+		b::target_speed = static_cast<float>(ADC2->JDR3>10?ADC2->JDR3:0)*adc_to_speed;
+
 		LL_GPIO_ResetOutputPin(LED_GPIO_Port,LED_Pin);
 	}
 }
@@ -143,8 +146,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(htim == &htim2){
 		//位置制御
 //		LL_GPIO_SetOutputPin(LED_GPIO_Port,LED_Pin);
+//		float target_speed = b::PIDIns::position(0,-b::enc.get_angle());
 		b::target_i.d = 0.0f;
-		b::target_i.q = b::PIDIns::speed(20000, -b::enc.get_speed());
+		b::target_i.q = b::PIDIns::speed(b::target_speed, -b::enc.get_speed());
 //		LL_GPIO_ResetOutputPin(LED_GPIO_Port,LED_Pin);
 	}
 }
