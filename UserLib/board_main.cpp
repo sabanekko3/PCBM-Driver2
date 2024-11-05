@@ -38,7 +38,7 @@ extern "C" void main_(void){
 
 	HAL_Delay(1000);
 
-	SabaneLib::MotorMath::UVW tmp = {.u=0.0f, .v=0.0f, .w=0.0f};
+	SabaneLib::Math::UVW tmp = {.u=0.0f, .v=0.0f, .w=0.0f};
 	for(int i = 0; i < 1000; i++){
 		tmp.u += b::uvw_i.u;
 		tmp.v += b::uvw_i.v;
@@ -101,8 +101,6 @@ extern "C" void main_(void){
 }
 
 void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc){
-
-	static int adc_flag = 0;
 	if(hadc == &hadc1){
 
 	}else if(hadc == &hadc2){
@@ -134,7 +132,7 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi){
 
 //	b::target_i = {0.0f,0.1f};
 
-	b::dq_v = slib::MotorMath::DQ{
+	b::dq_v = slib::Math::DQ{
 			.d = b::PIDIns::d_current(b::target_i.d,b::dq_i.d),
 			.q = b::PIDIns::q_current(b::target_i.q,b::dq_i.q)};
 

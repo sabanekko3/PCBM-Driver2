@@ -15,7 +15,7 @@
 #include "STM32_CommonLib/Math/sin_table.hpp"
 #include "STM32_CommonLib/pwm.hpp"
 #include "STM32_CommonLib/pid.hpp"
-#include "STM32_CommonLib/programable_LED.hpp"
+#include "STM32_CommonLib/programable_PWM.hpp"
 #include "STM32_CommonLib/LED_pattern.hpp"
 #include "STM32_CommonLib/cordic.hpp"
 #include "STM32_CommonLib/fdcan_control.hpp"
@@ -36,7 +36,7 @@ extern TIM_HandleTypeDef htim2;
 extern UART_HandleTypeDef huart1;
 
 namespace BoardElement{
-	inline auto table = SabaneLib::MotorMath::SinTable<10,SabaneLib::MotorMath::TableMode::NORMAL>{};
+	inline auto table = SabaneLib::Math::SinTable<10,SabaneLib::Math::TableMode::NORMAL>{};
 
 	namespace PIDIns{
 		inline auto position = SabaneLib::PIDBuilder(20000.0f)
@@ -67,18 +67,18 @@ namespace BoardElement{
 		SabaneLib::PWMHard{&htim1,TIM_CHANNEL_1}
 	};
 
-	inline SabaneLib::MotorMath::UVW uvw_i = {.u=0.0f, .v=0.0f, .w=0.0f};
-	inline SabaneLib::MotorMath::AB ab_i = {.a = 0.0f, .b = 0.0f};
-	inline SabaneLib::MotorMath::DQ dq_i = {.d = 0.0f, .q = 0.0f};
+	inline SabaneLib::Math::UVW uvw_i = {.u=0.0f, .v=0.0f, .w=0.0f};
+	inline SabaneLib::Math::AB ab_i = {.a = 0.0f, .b = 0.0f};
+	inline SabaneLib::Math::DQ dq_i = {.d = 0.0f, .q = 0.0f};
 
-	inline SabaneLib::MotorMath::DQ target_i = {.d = 0.0f, .q =0.0f};
+	inline SabaneLib::Math::DQ target_i = {.d = 0.0f, .q =0.0f};
 
-	inline SabaneLib::MotorMath::DQ dq_v;
+	inline SabaneLib::Math::DQ dq_v;
 
 	inline int32_t atan_enc_bias = 1357;
-	inline SabaneLib::MotorMath::UVW uvw_i_bias = {.u=0.0f, .v=0.0f, .w=0.0f};
+	inline SabaneLib::Math::UVW uvw_i_bias = {.u=0.0f, .v=0.0f, .w=0.0f};
 
-	inline auto speed_lpf = SabaneLib::LowpassFilter<float>{0.1};
+	inline auto speed_lpf = SabaneLib::Math::LowpassFilter<float>{0.1};
 
 	inline float target_speed = 0.0f;
 
